@@ -15,49 +15,49 @@ jobs:
     steps:
       - name: Send Web Notification
         run: |
-          REPO="${{ github.repository }}"
+          REPO="CAFE-WEB"
           AUTHOR="${{ github.actor }}"
-          EVENT="${{ github.event_name }}"
           BRANCH="${{ github.ref_name }}"
+          EVENT="${{ github.event_name }}"
           TIMESTAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 
           COLOR=5763719
-          TITLE="🌐 Web Update"
-          DESCRIPTION="${{ github.event.head_commit.message }}"
+          ICON="🌐"
+          TITLE="Web Update"
+          MESSAGE="${{ github.event.head_commit.message }}"
           URL="${{ github.event.head_commit.url }}"
 
           if [ "$BRANCH" = "main" ] && [ "$EVENT" = "push" ]; then
             COLOR=15158332
-            TITLE="🚨 WEB PUSH TO MAIN"
+            ICON="🚨"
+            TITLE="Web Push to Main"
           fi
 
           if [ "$EVENT" = "pull_request" ] && [ "${{ github.event.action }}" = "opened" ]; then
             COLOR=15844367
-            TITLE="🟡 Web PR Opened"
-            DESCRIPTION="${{ github.event.pull_request.title }}"
+            ICON="🟡"
+            TITLE="Web PR Opened"
+            MESSAGE="${{ github.event.pull_request.title }}"
             URL="${{ github.event.pull_request.html_url }}"
           fi
 
-          if [ "$EVENT" = "pull_request" ] && [ "${{ github.event.pull_request.merged }}" = "true" ]; then
+          if [ "${{ github.event.pull_request.merged }}" = "true" ]; then
             COLOR=3066993
-            TITLE="🟢 Web PR Merged"
-            DESCRIPTION="${{ github.event.pull_request.title }}"
+            ICON="🟢"
+            TITLE="Web PR Merged"
+            MESSAGE="${{ github.event.pull_request.title }}"
             URL="${{ github.event.pull_request.html_url }}"
           fi
 
-          curl -H "Content-Type: application/json" \
-          -X POST \
-          -d "{
+          curl -H "Content-Type: application/json" -X POST -d "{
             \"embeds\": [{
-              \"title\": \"${TITLE}\",
-              \"description\": \"**${DESCRIPTION}**\",
+              \"title\": \"${ICON} ${TITLE}\",
+              \"description\": \"\`${MESSAGE}\`\",
               \"color\": ${COLOR},
               \"fields\": [
-                {\"name\": \"📦 Repository\", \"value\": \"${REPO}\", \"inline\": true},
                 {\"name\": \"👤 Author\", \"value\": \"${AUTHOR}\", \"inline\": true},
                 {\"name\": \"🌿 Branch\", \"value\": \"${BRANCH}\", \"inline\": true}
               ],
-              \"url\": \"${URL}\",
               \"footer\": {
                 \"text\": \"CoffeeJob Dev Team • Web Automation\"
               },
